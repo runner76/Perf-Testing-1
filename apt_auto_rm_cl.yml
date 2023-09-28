@@ -1,0 +1,7 @@
+- name:  Autoremove and autoclean
+  become: true
+  apt:
+    autoremove: yes
+    clean: yes
+    cache_valid_time: 3600 #One day
+~                                   
