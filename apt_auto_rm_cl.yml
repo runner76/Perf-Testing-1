@@ -1,7 +1,16 @@
-- name:  Autoremove and autoclean
+---
+
+- hosts: all
   become: true
-  apt:
-    autoremove: yes
-    clean: yes
-    cache_valid_time: 3600 #One day
-~                                   
+  tasks:
+  
+  - name:  Autoremove
+    become: true
+    apt:
+      autoremove: yes
+  
+  - name: Clean
+    become: true
+    apt:
+      autoclean: yes
+          
