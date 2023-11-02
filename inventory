@@ -1,3 +1,6 @@
-192.168.1.86 # Ubuntu server
-192.168.1.87 # Ubuntu server 
-192.168.1.88 # Fedora server
+[ubuntu_servers]
+192.168.1.86 apache_package=apache2 php_package=libapache2-mod-php # Ubuntu server
+192.168.1.87 apache_package=apache2 php_package=libapache2-mod-php # Ubuntu server 
+
+[fedora_servers]
+192.168.1.88 apache_package=httpd php_package=php # Fedora server

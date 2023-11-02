@@ -1,0 +1,25 @@
+---
+
+- hosts: ubuntu_servers
+  become: true
+  tasks:
+
+  - name: remove apache2 and php (Ubuntu)
+    apt:
+      name: 
+        - apache2
+        - libapache2-mod-php 
+      state: absent
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: fedora_servers
+  become: true
+  tasks:
+
+  - name: remove apache2 and php (Fedora)
+    dnf:
+      name: 
+        - httpd
+        - php
+      state: absent
+    when: ansible_distribution == "Fedora"

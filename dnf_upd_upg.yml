@@ -1,0 +1,12 @@
+---
+
+- hosts: all
+  become: true
+  tasks:
+  
+  - name: Update and upgrade dnf packages
+    become: true
+    dnf:
+      update_only: yes
+      update_cache: yes
+      cache_valid_time: 3600 #One day
