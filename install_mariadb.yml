@@ -1,0 +1,36 @@
+---
+
+- hosts: db_servers 
+  become: true
+  pre_tasks:
+  
+  - name: install updates (Ubuntu)
+    apt:
+      upgrade: dist
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install updates (Fedora)
+    dnf:
+      upgrade_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Fedora"
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: install mariadb (Ubuntu)
+    apt:
+      name: mariadb-server 
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install mariadb (Fedora)
+    dnf:
+      name: mariadb 
+      state: latest
+    when: ansible_distribution == "Fedora"
+
+
+

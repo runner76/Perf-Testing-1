@@ -1,0 +1,20 @@
+---
+
+- hosts: db_servers 
+  become: true
+  tasks:
+
+  - name: remove mariadb (Ubuntu)
+    apt:
+      name: mariadb-server 
+      state: absent
+    when: ansible_distribution == "Ubuntu"
+
+  - name: remove mariadb (Fedora)
+    dnf:
+      name: mariadb 
+      state: absent
+    when: ansible_distribution == "Fedora"
+
+
+
