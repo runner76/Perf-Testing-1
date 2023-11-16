@@ -5,7 +5,7 @@ subnet="192.168.1"
 # File to store the active hosts
 output_file="inventory"
 
-# Temporary file to hold unique IPs
+# Temporary file to hold unique active IPs
 temp_file=$(mktemp)
 
 # Loop through hosts and collect active IPs
@@ -16,20 +16,44 @@ for host in {86..90}; do
     fi
 done | sort -u > "$temp_file"
 
-# Find the position of [active_hosts] in the file
-line_number=$(awk '/\[active_hosts\]/{print NR; exit}' "$output_file")
-
-# Insert the unique IPs between [active_hosts] and the next [
-awk -v line="$line_number" 'NR==line+1 {print "[active_hosts]"; system("cat '"$temp_file"'")} {print} /^$/ && NR>line+1 && !printed {print ""; printed=1}' "$output_file" > "$output_file.tmp" && mv "$output_file.tmp" "$output_file"
-
-# Add a new line at the end if it doesn't exist
-last_char=$(tail -c 1 "$output_file" 2>/dev/null)
-if [ -n "$last_char" ]; then
-    echo "" >> "$output_file"
+# Check if [active_hosts] exists in the file
+if grep -q "\[active_hosts\]" "$output_file"; then
+    awk -v subnet="$subnet" '
+        BEGIN {
+            active = 0
+        }
+        /^\[active_hosts\]/ {
+            print $0
+            while ((getline < temp_file) > 0) {
+                active_ips[$0] = 1
+            }
+            close(temp_file)
+            active = 1
+        }
+        active && /^\[/ {
+            for (line in active_ips) {
+                print line
+            }
+	    print ""
+            active = 0
+        }
+        !active
+        END {
+            if (!active) {
+                if (length(active_ips) == 0) {
+                    print "[active_hosts]"
+                    while ((getline < temp_file) > 0) {
+                        print $0
+                    }
+                    close(temp_file)
+                }
+            }
+        }
+    ' temp_file="$temp_file" "$output_file" > "$output_file.tmp" && mv "$output_file.tmp" "$output_file"
+else
+    echo "[active_hosts]" >> "$output_file"
+    cat "$temp_file" >> "$output_file"
 fi
-
-# Remove duplicates, retaining empty lines
-awk '!seen[$0]++ || $0 == ""' "$output_file" > "$output_file.tmp" && mv "$output_file.tmp" "$output_file"
 
 # Remove temporary file
 rm "$temp_file"
