@@ -1,0 +1,15 @@
+---
+
+- hosts: workstations
+  become: true
+  tasks:
+
+  - name: retrieve active hosts
+    script: active_machine.sh
+
+- hosts: active_hosts 
+  become: true
+  tasks:
+
+  - name: shut down machines
+    community.general.shutdown:
